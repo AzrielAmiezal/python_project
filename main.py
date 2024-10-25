@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
-#from streamlit_option_menu import option_menu
+from streamlit_option_menu import option_menu
 
 # Use st.cache_data to cache the data-loading function
 @st.cache_data
@@ -11,6 +11,25 @@ def load_data():
     df["ADMISSION DATE"] = pd.to_datetime(df["ADMISSION DATE"])
     df["DATE_OF_FIRST_SYMPTOM"] = pd.to_datetime(df["DATE_OF_FIRST_SYMPTOM"])
     df["DATE_OF_DEATH"] = pd.to_datetime(df["DATE_OF_DEATH"])
+    data = pd.read_excel("data_dictionary.xlsx")
+    data['variable'] = data['variable'].str.upper()
+    def parse(value_string):
+     return {
+            int(key.strip()): value.strip()
+            for item in value_string.split(",")
+            for key, value in [item.split("=")]
+        }
+
+    # Create a dictionary for each 'variable' based on the parsed 'value'
+    data_dict = {
+      row['variable']: parse(row['value'])
+      for _, row in data.iterrows()
+    }
+
+
+    for col in df.columns:
+        if col in data_dict:  # Check if the column has a corresponding dictionary
+            df[col] = df[col].map(data_dict[col])  # Map values
     return df
 
 df = load_data()
@@ -69,9 +88,10 @@ elif selected == "Intubation & ICU":
         st.bar_chart(intubation_counts)
 
     with tab2:
+        df_new = pd.read_csv("dataset.csv")
         st.subheader("Correlation between Diseases and ICU Admission")
         diseases = ['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']
-        df_diseases_icu = df[diseases + ['ICU']].apply(pd.to_numeric, errors='coerce').fillna(0)
+        df_diseases_icu = df_new[diseases + ['ICU']].apply(pd.to_numeric, errors='coerce').fillna(0)
         correlation_matrix = df_diseases_icu.corr()
         fig, ax = plt.subplots(figsize=(10, 8))
         sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5, ax=ax)
@@ -79,17 +99,18 @@ elif selected == "Intubation & ICU":
 
 # Page: Diseases & Mortality
 elif selected == "Diseases & Mortality":
+    df_new = pd.read_csv("dataset.csv")
     st.title("Diseases & Mortality Analysis")
     
     tab1, tab2 = st.tabs(["Common Diseases", "Diseases among Deceased"])
 
     with tab1:
         st.subheader("Common Diseases Distribution")
-        disease_counts = df[['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']].apply(pd.Series.value_counts).loc[1]
+        disease_counts = df_new[['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']].apply(pd.Series.value_counts).loc[1]
         st.bar_chart(disease_counts)
 
     with tab2:
         st.subheader("Common Diseases among Deceased Patients")
-        deceased_df = df[df['OUTCOME'] == 1]
+        deceased_df = df_new[df_new['OUTCOME'] == 1]
         deceased_disease_counts = deceased_df[['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']].apply(lambda x: (x == 1).sum())
         st.bar_chart(deceased_disease_counts)
