@@ -25,13 +25,14 @@ df.info()
 
 print(df)
 
+# import dictionary data
 data = pd.read_excel("data_dictionary.xlsx")
 
-data
+print(data)
 
 data['variable'] = data['variable'].str.upper()
 
-def parse_value_string(value_string):
+def parse(value_string):
     return {
         int(key.strip()): value.strip()
         for item in value_string.split(",")
@@ -40,7 +41,7 @@ def parse_value_string(value_string):
 
 # Create a dictionary for each 'variable' based on the parsed 'value'
 data_dict = {
-    row['variable']: parse_value_string(row['value'])
+    row['variable']: parse(row['value'])
     for _, row in data.iterrows()
 }
 
@@ -52,3 +53,17 @@ for col in df.columns:
         df[col] = df[col].map(data_dict[col])  # Map values
 
 print(df)
+
+# Define age bins and labels
+age_bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+age_labels = ['0-10', '11-20', '21-30', '31-40', '41-50', '51-60', '61-70', '71-80', '81-90', '91-100']
+
+# Cut the 'AGE' column into the defined bins
+df['AGE_GROUP'] = pd.cut(df['AGE'], bins=age_bins, labels=age_labels, right=False)
+
+# Count the occurrences in each age group
+age_group_counts = df['AGE_GROUP'].value_counts().sort_index()
+
+print(age_group_counts)
+
+df.to_excel("dataset_cleaned")
