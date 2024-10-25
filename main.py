@@ -106,7 +106,7 @@ elif selected == "Diseases & Mortality":
 
     with tab1:
         st.subheader("Common Diseases Distribution")
-        disease_counts = df_new[['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']].apply(pd.Series.value_counts).loc[1]
+        disease_counts = df_new[['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']].apply(pd.Series.value_counts).iloc[1]
         st.bar_chart(disease_counts)
 
     with tab2:
