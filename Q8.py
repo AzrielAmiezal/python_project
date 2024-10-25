@@ -6,7 +6,7 @@ dataset_path = 'dataset.csv'
 df = pd.read_csv(dataset_path)
 
 # Filter the dataset for deceased patients
-deceased_df = df[df['OUTCOME'] == 'DECEASED']
+deceased_df = df[df['OUTCOME'] == 1]
 
 # List of diseases to analyze
 diseases = ['DIABETES', 'COPD', 'ASTHMA', 'INMUSUPR', 'HYPERTENSION', 'CARDIOVASCULAR', 'OBESITY', 'CHRONIC_KIDNEY', 'TOBACCO']
