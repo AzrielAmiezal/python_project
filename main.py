@@ -46,7 +46,7 @@ with st.sidebar:
 
 # Page: Data Overview
 if selected == "Data Overview":
-    st.title("COVID-19 Data Overview")
+    st.title("COVID-19 Impact Analysis in Mexico")
     st.write("This section provides a general overview of the dataset.")
     st.write(df.head(10))
 
